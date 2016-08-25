@@ -43,13 +43,20 @@ void exportPropertyTree() {
       .def("getStringDefault", &getStringDefault)
       .def("getBool", &getBool).def("getBoolDefault", &getBoolDefault)
       .def("getDouble", &getDouble).def("getDoubleDefault", &getDoubleDefault)
-      .def("setInt", &PropertyTree::setInt)
-      .def("setBool", &PropertyTree::setBool)
-      .def("setString", &PropertyTree::setString)
-      .def("setDouble", &PropertyTree::setDouble)
       .def("doesKeyExist", &PropertyTree::doesKeyExist);
 
-  class_<BoostPropertyTree, bases<PropertyTree> >("BoostPropertyTree", init<>())
+  class_<MutablePropertyTree, bases<PropertyTree>>("MutablePropertyTree", init<const MutablePropertyTree &, const std::string &>("MutablePropertyTree(MutablePropertyTree parent, string childNamespace)"))
+      .def("getOrCreateInt", static_cast<int(MutablePropertyTree::*)(const std::string &, int)>(&MutablePropertyTree::getInt))
+      .def("getOrCreateString", static_cast<std::string(MutablePropertyTree::*)(const std::string &, const std::string&)>(&MutablePropertyTree::getString))
+      .def("getOrCreatetBool", static_cast<bool(MutablePropertyTree::*)(const std::string &, bool)>(&MutablePropertyTree::getBool))
+      .def("getOrCreateDouble", static_cast<double(MutablePropertyTree::*)(const std::string &, double)>(&MutablePropertyTree::getDouble))
+      .def("setInt", &MutablePropertyTree::setInt)
+      .def("setBool", &MutablePropertyTree::setBool)
+      .def("setString", &MutablePropertyTree::setString)
+      .def("setDouble", &MutablePropertyTree::setDouble)
+      ;
+
+  class_<BoostPropertyTree, bases<MutablePropertyTree> >("BoostPropertyTree", init<>())
       .def(init<std::string>("BoostPropertyTree( string baseNamespace )"))
       .def("loadXml", &BoostPropertyTree::loadXmlStr)
       .def("saveXml", &BoostPropertyTree::saveXmlStr)

@@ -19,6 +19,7 @@
 namespace sm {
   // Forward declaration.
   class PropertyTreeImplementation;
+  struct ConstKeyPropertyTreePair;
   struct KeyPropertyTreePair;
 
 
@@ -87,9 +88,9 @@ namespace sm {
    *   The classes BoostPropertyTreeImplementation and BoostPropertyTree are good examples of how to do this.
    *
    */
-  class PropertyTree
-  {
-  public:
+
+  class PropertyTree {
+   public:
     SM_DEFINE_EXCEPTION(Exception, std::runtime_error);
     SM_DEFINE_EXCEPTION(InvalidKeyException, Exception);
     SM_DEFINE_EXCEPTION(InvalidValueException, Exception);
@@ -97,45 +98,76 @@ namespace sm {
 
     PropertyTree(boost::shared_ptr<PropertyTreeImplementation> imp, const std::string & baseNamespace = "");
     PropertyTree(const PropertyTree & parent, const std::string & childNamespace);
-
     virtual ~PropertyTree();
+
+    const PropertyTree getChild(const std::string & childNamespace) const {
+      return PropertyTree(*this, childNamespace);
+    }
 
     double getDouble(const std::string & key) const;
     double getDouble(const std::string & key, double defaultValue) const;
-    double getDouble(const std::string & key, double defaultValue);
 
     int getInt(const std::string & key) const;
     int getInt(const std::string & key, int defaultValue) const;
-    // The non-const version will call "set" if the value is not already set.
-    int getInt(const std::string & key, int defaultValue);
 
     bool getBool(const std::string & key) const;
     bool getBool(const std::string & key, bool defaultValue) const;
-    // The non-const version will call setBool if the value is not already set.
-    bool getBool(const std::string & key, bool defaultValue);
 
     std::string getString(const std::string & key) const;
     std::string getString(const std::string & key, const std::string & defaultValue) const;
+
+
+    bool doesKeyExist(const std::string & key) const;
+
+    std::vector<ConstKeyPropertyTreePair> getChildren() const;
+   protected:
+     std::string _namespace;
+     std::string buildQualifiedKeyName(const std::string & key) const;
+     boost::shared_ptr<PropertyTreeImplementation> _imp;
+  };
+
+  class MutablePropertyTree : public PropertyTree
+  {
+   public:
+    MutablePropertyTree(boost::shared_ptr<PropertyTreeImplementation> imp, const std::string & baseNamespace = "");
+    MutablePropertyTree(const MutablePropertyTree & parent, const std::string & childNamespace);
+    virtual ~MutablePropertyTree();
+
+    MutablePropertyTree getChild(const std::string & childNamespace) const {
+      return MutablePropertyTree(*this, childNamespace);
+    }
+
+    using PropertyTree::getDouble;
+    // The non-const version will call "set" if the value is not already set.
+    double getDouble(const std::string & key, double defaultValue);
+
+    using PropertyTree::getInt;
+    // The non-const version will call "set" if the value is not already set.
+    int getInt(const std::string & key, int defaultValue);
+
+    using PropertyTree::getBool;
     // The non-const version will call setBool if the value is not already set.
-    std::string getString(const std::string & key, const std::string & defaultValue) ;
+    bool getBool(const std::string & key, bool defaultValue);
+
+    using PropertyTree::getString;
+    // The non-const version will call setBool if the value is not already set.
+    std::string getString(const std::string & key, const std::string & defaultValue);
 
     void setDouble(const std::string & key, double value);
     void setInt(const std::string & key, int value);
     void setBool(const std::string & key, bool value) ;
     void setString(const std::string & key, const std::string & value);
 
-
-    bool doesKeyExist(const std::string & key) const;
-
-    const std::vector<KeyPropertyTreePair> getChildren() const;
-    std::vector<KeyPropertyTreePair> getChildren();
-  protected:
-    std::string _namespace;
-    std::string buildQualifiedKeyName(const std::string & key) const;
-    boost::shared_ptr<PropertyTreeImplementation> _imp;
+    using PropertyTree::getChildren;
+    std::vector<KeyPropertyTreePair> getChildren() const;
   };
 
   struct KeyPropertyTreePair {
+    std::string key;
+    MutablePropertyTree pt;
+  };
+
+  struct ConstKeyPropertyTreePair {
     std::string key;
     PropertyTree pt;
   };

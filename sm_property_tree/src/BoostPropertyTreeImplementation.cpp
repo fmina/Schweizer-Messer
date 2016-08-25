@@ -245,12 +245,7 @@ namespace sm {
     return _ptree.end();
   }
 
-
-  const std::vector<KeyPropertyTreePair> sm::BoostPropertyTreeImplementation::getChildren(const std::string & key) const {
-    return const_cast<BoostPropertyTreeImplementation*>(this)->getChildren(key);
-  }
-
-  std::vector<KeyPropertyTreePair> sm::BoostPropertyTreeImplementation::getChildren(const std::string & key) {
+  std::vector<KeyPropertyTreePair> sm::BoostPropertyTreeImplementation::getChildren(const std::string & key) const {
     std::vector<KeyPropertyTreePair> ret;
     auto * pt = &_ptree;
     std::string k;
@@ -265,7 +260,7 @@ namespace sm {
       pt = & _ptree.get_child(k);
     }
     for(auto& p : *pt){
-      ret.push_back({p.first, PropertyTree(boost::make_shared<BoostPropertyTreeImplementation>(p.second), "")});
+      ret.push_back({p.first, MutablePropertyTree(boost::make_shared<BoostPropertyTreeImplementation>(p.second), "")});
     }
     return ret;
   }
@@ -290,7 +285,7 @@ namespace sm {
   void updateOnly(boost::property_tree::ptree &dest, bool ignoreEmptyUpdates, const boost::property_tree::ptree::path_type &childPath, const boost::property_tree::ptree &child) {
     if(ignoreEmptyUpdates && (child.data().empty() || child.data().find_first_not_of(" \n\t\r") == std::string::npos)) return;
     if(!dest.get_optional<std::string>(childPath)) {
-      throw PropertyTree::KeyNotFoundException(std::string("Could not find the destination '") + childPath.dump() + "' to update with '" + child.data() + "'.");
+      throw MutablePropertyTree::KeyNotFoundException(std::string("Could not find the destination '") + childPath.dump() + "' to update with '" + child.data() + "'.");
     }
     dest.put(childPath, child.data());
   }

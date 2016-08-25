@@ -13,7 +13,7 @@
 
 namespace sm {
   
-  class BoostPropertyTree : public PropertyTree
+  class BoostPropertyTree : public MutablePropertyTree
   {
   public:
     typedef boost::property_tree::ptree ptree;

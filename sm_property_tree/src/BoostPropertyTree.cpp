@@ -11,13 +11,13 @@ namespace sm {
   bool BoostPropertyTree::ignoreComments = true;
   
   BoostPropertyTree::BoostPropertyTree(const std::string & baseNamespace) :
-    PropertyTree(boost::shared_ptr<PropertyTreeImplementation>(new BoostPropertyTreeImplementation), baseNamespace)
+    MutablePropertyTree(boost::shared_ptr<PropertyTreeImplementation>(new BoostPropertyTreeImplementation), baseNamespace)
   {
 
   }
 
   BoostPropertyTree::BoostPropertyTree(const boost::property_tree::ptree& ptree, const std::string & baseNamespace) :
-    PropertyTree(boost::shared_ptr<PropertyTreeImplementation>(new BoostPropertyTreeImplementation(ptree)), baseNamespace)
+    MutablePropertyTree(boost::shared_ptr<PropertyTreeImplementation>(new BoostPropertyTreeImplementation(ptree)), baseNamespace)
   {
 
   }
